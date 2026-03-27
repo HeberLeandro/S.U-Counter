@@ -31,27 +31,37 @@ onSnapshot(contadorRef, (docSnap) => {
 const eventosRef = collection(db, "eventos");
 
 window.darTapa = async function () {
-try {
-const agora = new Date();
+  try {
+    const agora = new Date();
 
-const dia = agora.toISOString().split("T")[0];
-const mes = dia.substring(0, 7);
-const ano = dia.substring(0, 4);
+    const auxDate = agora.toLocaleString().split(', ')[0];
 
-await addDoc(eventosRef, {
-    tipo: "slap",
-    data: serverTimestamp(),
-    dia,
-    mes,
-    ano
-});
+    const dia = auxDate.substring(6,10) + "-" + auxDate.substring(3,5) + "-" + auxDate.substring(0,2);
+    const mes = auxDate.substring(6,10) + "-" + auxDate.substring(3,5);
+    const ano = auxDate.substring(6,10);
 
-animar();
-som.play();
+    // 🔥 incrementa contador global (seguro)
+    await updateDoc(contadorRef, {
+      valor: increment(1)
+    });
 
-} catch (e) {
-console.error("Erro:", e);
-}
+
+    await addDoc(eventosRef, {
+        tipo: "slap",
+        data: serverTimestamp(),
+        dia,
+        mes,
+        ano
+    });
+
+    animar();
+    som.play();
+
+    carregarGrafico();
+
+    } catch (e) {
+      console.error("Erro:", e);
+    }
 };
 
 // 🔁 Reset
